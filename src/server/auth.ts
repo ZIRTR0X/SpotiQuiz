@@ -1,12 +1,13 @@
+import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 
+import SpotifyProvider from "next-auth/providers/spotify";
 import { env } from "~/env";
-
+import { LOGIN_URL } from "./spotifyAPI";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -15,11 +16,12 @@ import { env } from "~/env";
  */
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    user: {
+    user: DefaultSession["user"] & {
       id: string;
+      accessToken: string;
       // ...other properties
       // role: UserRole;
-    } & DefaultSession["user"];
+    };
   }
 
   // interface User {
@@ -40,13 +42,34 @@ export const authOptions: NextAuthOptions = {
       user: {
         ...session.user,
         id: token.sub,
+        accessToken: token.accessToken,
       },
     }),
+    async jwt({ token, account, user }) {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (account && user) {
+        return {
+          ...token,
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          username: account.providerAccountId,
+          accessTokenExpires: account.expires_at ?? 1 * 1000,
+        };
+      }
+
+      if (Date.now() < (token.accessTokenExpires as number) * 1000) {
+        console.log("EXISTING ACCESS TOKEN IS VALID");
+        return token;
+      }
+
+      return token;
+    },
   },
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    SpotifyProvider({
+      clientId: env.SPOTIFY_CLIENT_ID,
+      clientSecret: env.SPOTIFY_CLIENT_SECRET,
+      authorization: LOGIN_URL,
     }),
     /**
      * ...add more providers here.
@@ -65,4 +88,9 @@ export const authOptions: NextAuthOptions = {
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-export const getServerAuthSession = () => getServerSession(authOptions);
+export const getServerAuthSession = (ctx: {
+  req: GetServerSidePropsContext["req"];
+  res: GetServerSidePropsContext["res"];
+}) => {
+  return getServerSession(ctx.req, ctx.res, authOptions);
+};
