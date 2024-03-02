@@ -3,7 +3,7 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
-import Header from "~/components/header";
+import Header from "~/app/components/header";
 import { SessionProvider } from "next-auth/react";
 import { NextUIProvider } from "@nextui-org/react";
 
