@@ -1,12 +1,17 @@
 "use client";
 
 import { Button, Input, Tab, Tabs } from "@nextui-org/react";
-import { useState } from "react";
 import MainWrapper from "~/app/components/mainWrapper";
 import { GameOptions } from "~/models/gameOptions";
 import { WinningGameOptions } from "~/models/winningGameOptions";
+import { SocketContext } from "~/app/components/socketProvider";
+import { useContext, useEffect, useState } from "react";
+import MusicPlayer from "~/app/components/musicPlayer";
 
 export default function HomePage() {
+
+  const socket = useContext(SocketContext);
+
   const [gameOptions, setGameOptions] = useState<GameOptions | null>(null);
 
   function startGame(): void {
@@ -110,6 +115,9 @@ export default function HomePage() {
         <Button className="btn btn-primary" onClick={() => startGame()}>
           Commencer
         </Button>
+      </div>
+      <div>
+        <MusicPlayer/>
       </div>
     </MainWrapper>
   );

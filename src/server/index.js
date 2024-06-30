@@ -1,16 +1,10 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-import cors from "cors";
 
-import { Album } from "../models/album";
-import { Artist } from "../models/artist";
-import { GameOptions } from "../models/gameOptions";
-import { Image } from "../models/image";
-import { Music } from "../models/music";
-import { Player } from "../models/player";
-import { Playlist } from "../models/playlist";
-import { WinningGameOptions } from "../models/winningGameOptions";
-import { Game } from "~/models/game";
+import { Music } from "./model/music";
+import { Player } from "./model/player";
+import { Playlist } from "./model/playlist";
+import { Game } from "./model/game";
 
 const httpServer = createServer();
 
@@ -19,7 +13,7 @@ let gameList = [];
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000", // Replace with your frontend URL
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,

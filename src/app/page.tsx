@@ -4,6 +4,8 @@ import { Button } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MainWrapper from "./components/mainWrapper";
+import { SocketProvider } from "./components/socketProvider";
+
 
 export default function HomePage() {
   const session = useSession();
@@ -19,15 +21,17 @@ export default function HomePage() {
 
   return (
     <div>
-      <MainWrapper>
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          <span className="text-purple-500">S</span>poti
-          <span className="text-purple-500">Q</span>uiz
-        </h1>
-        <div className="mt-16 flex flex-row justify-center">
-          <Button onClick={() => handleStartQuiz()}>Commencer</Button>
-        </div>
-      </MainWrapper>
+      <SocketProvider>
+        <MainWrapper>
+          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+            <span className="text-purple-500">S</span>poti
+            <span className="text-purple-500">Q</span>uiz
+          </h1>
+          <div className="mt-16 flex flex-row justify-center">
+            <Button onClick={() => handleStartQuiz()}>Commencer</Button>
+          </div>
+        </MainWrapper>
+      </SocketProvider>
     </div>
   );
 }
